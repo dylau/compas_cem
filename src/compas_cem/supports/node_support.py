@@ -1,9 +1,4 @@
-import compas
-
-if compas.RHINO:
-    from compas_rhino.geometry import RhinoPoint
-
-from compas_cem import Data
+from compas_cem.data import Data
 
 
 __all__ = ["NodeSupport"]
@@ -27,7 +22,8 @@ class NodeSupport(Data):
     node_support : ``NodeSupport``
         A node support.
     """
-    def __init__(self, node):
+    def __init__(self, node, **kwargs):
+        super(NodeSupport, self).__init__(**kwargs)
         self.node = node
         self.xyz = None
 
@@ -55,30 +51,6 @@ class NodeSupport(Data):
         support = cls(node=None)
         support.xyz = point
         return support
-
-    @classmethod
-    def from_rhino_point(cls, rhino_point):
-        """
-        Create a NodeSupport from a rhino point.
-
-        Parameters
-        ----------
-        point : ``Rhino.Geometry.Point3d``
-            The xyz position where to apply a support.
-
-        Returns
-        -------
-        support : ``NodeSupport``
-            A support object.
-
-        Notes
-        -----
-        The support will be assigned to a ``FormDiagram`` only if it has a node
-        whose xyz coordinates matches defined by the ``NodeSupport``.
-        Otherwise, the support will not be assigned to the diagram.
-        """
-        xyz = RhinoPoint.from_geometry(rhino_point).to_compas()
-        return cls.from_point(xyz)
 
     def __repr__(self):
         """

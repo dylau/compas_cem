@@ -5,14 +5,24 @@ compas_cem.plotters
 .. currentmodule:: compas_cem.plotters
 
 
-Classes
+Artists
 =======
 
 .. autosummary::
     :toctree: generated/
     :nosignatures:
 
-    FormPlotter
+    FormArtist
+    TopologyArtist
+
+Plotters
+========
+
+.. autosummary::
+    :toctree: generated/
+    :nosignatures:
+
+    Plotter
 """
 
 from __future__ import absolute_import
@@ -21,13 +31,9 @@ from __future__ import print_function
 
 
 # from .<module> import *
-import compas
-
-if not compas.IPY:
-    from .form_plotter import *  # noqa F403
-    from .topology_plotter import *  # noqa F403
-
-from .proxy import *  # noqa F403
-
+from .formartist import *  # noqa F403
+from .topologyartist import *  # noqa F403
+from .plotter import *  # noqa F403
+# from .proxy import *  # noqa F403
 
 __all__ = [name for name in dir() if not name.startswith('_')]

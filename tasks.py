@@ -239,8 +239,8 @@ def chdir(dirname=None):
 
 
 @task(help={
-      'gh_io_folder': 'Folder where GH_IO.dll is located. Usually Rhino installation folder.',
-      'ironpython': 'Command for running the IronPython executable. Defaults to `sh temp/ipy.sh`.'})
+      'gh_io_folder': 'Folder where GH_IO.dll is located. If not specified, it will try to download from NuGet.',
+      'ironpython': 'Command for running the IronPython executable. Defaults to `ipy`.'})
 def ghplugin(ctx, gh_io_folder=None, ironpython=None):
     """Build Grasshopper user objects from source"""
     clean(ctx, docs=False, bytecode=False, builds=False, ghuser=True)
@@ -251,10 +251,18 @@ def ghplugin(ctx, gh_io_folder=None, ironpython=None):
             ctx.run('git clone https://github.com/compas-dev/compas-actions.ghpython_components.git {}'.format(action_dir))
 
             if not gh_io_folder:
+                gh_io_folder = 'temp'
                 import compas_ghpython
-                gh_io_folder = compas_ghpython.get_grasshopper_plugin_path('6.0')
+                compas_ghpython.fetch_ghio_lib(gh_io_folder)
 
             if not ironpython:
+                # TODO ipy.sh is a file stored in the temp folder
+                # The default approach from COMPAS was to invoke 'ipy'
+                # But I replaced that here to make it work with my current install
+                # macOS Catalina 10.15.7
                 ironpython = 'sh temp/ipy.sh'  # 'ipy'
 
-            ctx.run('{} {} {} {} --ghio "{}"'.format(ironpython, os.path.join(action_dir, 'componentize.py'), source_dir, target_dir, os.path.abspath(gh_io_folder)))
+            gh_io_folder = os.path.abspath(gh_io_folder)
+            componentizer_script = os.path.join(action_dir, 'componentize.py')
+
+            ctx.run('{} {} {} {} --ghio "{}"'.format(ironpython, componentizer_script, source_dir, target_dir, gh_io_folder))

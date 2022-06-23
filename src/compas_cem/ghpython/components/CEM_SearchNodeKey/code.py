@@ -7,9 +7,12 @@ from compas.utilities import geometric_key
 from compas_rhino.geometry import RhinoPoint
 
 
-class NodeSearchComponent(component):
+class SearchNodeKeyComponent(component):
     def RunScript(self, diagram, point):
-        if point and diagram:
-            pt = RhinoPoint.from_geometry(point).to_compas()
-            gkey = geometric_key(pt, diagram.tol)
-            return diagram.gkey_node[gkey]
+        if not (point and diagram):
+            return
+
+        pt = RhinoPoint.from_geometry(point).to_compas()
+        gkey = geometric_key(pt, diagram.tol)
+
+        return diagram.gkey_node[gkey]

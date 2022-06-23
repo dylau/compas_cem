@@ -27,6 +27,7 @@ from __future__ import division
 from __future__ import print_function
 
 # from .<module> import *
+from .parameter import *  # noqa F403
 from .edge import *  # noqa F403
 from .node import *  # noqa F403
 

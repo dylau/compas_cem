@@ -1,7 +1,6 @@
-from math import fabs
 from math import sqrt
 
-from compas.geometry import length_vector
+from compas.geometry import Translation
 
 from compas_cem.diagrams import TopologyDiagram
 
@@ -13,94 +12,120 @@ from compas_cem.supports import NodeSupport
 
 from compas_cem.equilibrium import static_equilibrium
 
-from compas_cem.plotters import TopologyPlotter
-from compas_cem.plotters import FormPlotter
-
 from compas_cem.optimization import Optimizer
 from compas_cem.optimization import TrailEdgeForceConstraint
 from compas_cem.optimization import DeviationEdgeParameter
 
+from compas_cem.plotters import Plotter
 
-# global controls
-OPTIMIZE = True
-PLOT = True
 
-width = 4
-height = width / 2
+# ------------------------------------------------------------------------------
+# Instantiate a topology diagram
+# ------------------------------------------------------------------------------
 
-# Topology diagram
 topology = TopologyDiagram()
 
-# add nodes
-topology.add_node(Node(1, [-width / 2, height, 0.0]))
-topology.add_node(Node(2, [width / 2, height, 0.0]))
-topology.add_node(Node(3, [0.0, height / 2, 0.0]))
+# ------------------------------------------------------------------------------
+# Add nodes
+# ------------------------------------------------------------------------------
+
+width = 4.0
+height = width / 2
+
+topology.add_node(Node(1, [-width / 2.0, height, 0.0]))
+topology.add_node(Node(2, [width / 2.0, height, 0.0]))
+topology.add_node(Node(3, [0.0, height / 2.5, 0.0]))
 topology.add_node(Node(4, [0.0, 0.0, 0.0]))
 
-# add edges with negative values for a compression-only structure
+# ------------------------------------------------------------------------------
+# Add edges
+# ------------------------------------------------------------------------------
+
 topology.add_edge(TrailEdge(3, 4, length=-height/2))
 topology.add_edge(DeviationEdge(1, 3, force=-sqrt(4.0)))
 topology.add_edge(DeviationEdge(2, 3, force=-sqrt(2.0)))
 topology.add_edge(DeviationEdge(1, 2, force=2.0))
 
-# add supports
+# ------------------------------------------------------------------------------
+# Add supports
+# ------------------------------------------------------------------------------
+
 topology.add_support(NodeSupport(4))
 
-# add loads
+# ------------------------------------------------------------------------------
+# Add loads
+# ------------------------------------------------------------------------------
+
 topology.add_load(NodeLoad(1, [0.0, -1.0, 0.0]))
 topology.add_load(NodeLoad(2, [0.0, -1.0, 0.0]))
 
-# auto generate trails and auxiliary trails
+# ------------------------------------------------------------------------------
+# Build trails and auto generate auxiliary trails
+# ------------------------------------------------------------------------------
+
 topology.build_trails(auxiliary_trails=True)
 
-# form-finding
+# ------------------------------------------------------------------------------
+# Compute a state of static equilibrium
+# ------------------------------------------------------------------------------
+
 form = static_equilibrium(topology, eta=1e-5, tmax=100)
 
-if OPTIMIZE:
-    # create optimizer
-    optimizer = Optimizer()
+# ------------------------------------------------------------------------------
+# Minimize the forces in the axiliary trails
+# ------------------------------------------------------------------------------
 
-    # add goal constraints
-    for edge in topology.auxiliary_trail_edges():
-        optimizer.add_constraint(TrailEdgeForceConstraint(edge, force=0.0))
-        optimizer.add_constraint(TrailEdgeForceConstraint(edge, force=0.0))
+optimizer = Optimizer()
 
-    # add parameters
-    optimizer.add_parameter(DeviationEdgeParameter((1, 2), 1.0, 10.0))
-    optimizer.add_parameter(DeviationEdgeParameter((1, 3), 1.0, 10.0))
-    optimizer.add_parameter(DeviationEdgeParameter((2, 3), 10.0, 1.0))
+# add goal constraints
+for edge in topology.auxiliary_trail_edges():
+    optimizer.add_constraint(TrailEdgeForceConstraint(edge, force=0.0))
+    optimizer.add_constraint(TrailEdgeForceConstraint(edge, force=0.0))
 
-    # optimize
-    form = optimizer.solve_nlopt(topology, "SLSQP", 100, 1e-6)
+# add parameters
+optimizer.add_parameter(DeviationEdgeParameter((1, 2), 1.0, 10.0))
+optimizer.add_parameter(DeviationEdgeParameter((1, 3), 1.0, 10.0))
+optimizer.add_parameter(DeviationEdgeParameter((2, 3), 10.0, 1.0))
 
-    # print out value of the objective function, should be a small number
-    print("Total value of the objective function: {}".format(optimizer.penalty))
-    print("Norm of the gradient of the objective function: {}".format(optimizer.gradient_norm))
+# optimize
+form_opt = optimizer.solve_nlopt(topology, "SLSQP", 100, 1e-6)
 
-if PLOT:
+# print out value of the objective function, should be a small number
+print("Total value of the objective function: {}".format(optimizer.penalty))
+print("Norm of the gradient of the objective function: {}".format(optimizer.gradient_norm))
 
-    plotter = TopologyPlotter(topology, figsize=(16, 9))
-    plotter.draw_nodes(radius=0.05, text="key")
-    plotter.draw_loads(radius=0.05, draw_arrows=True, scale=0.5)
-    plotter.draw_edges()
-    plotter.show()
+# ------------------------------------------------------------------------------
+# Plot results
+# ------------------------------------------------------------------------------
 
-    plotter = FormPlotter(form, figsize=(16, 9))
+ns = 0.3
+shift = width * 1.2
+plotter = Plotter(figsize=(16.0, 9.0))
 
-    keys = []
-    for node in form.nodes():
-        if form.is_node_support(node):
-            if length_vector(form.reaction_force(node)) <= 0.001:
-                continue
-        keys.append(node)
+# plot topology diagram
+plotter.add(topology,
+            nodesize=ns,
+            show_nodetext=True,
+            nodetext="key")
 
-    # keys = None
+# plot translated form diagram
+T = Translation.from_vector([shift, 0.0, 0.0])
+plotter.add(form.transformed(T),
+            nodesize=ns,
+            show_nodetext=True,
+            nodetext="key",
+            show_edgetext=True,
+            edgetext="force")
 
-    plotter.draw_nodes(keys=keys, radius=0.05, text="key-xyz")
-    plotter.draw_loads(keys=keys, scale=0.5)
-    plotter.draw_reactions(keys=keys, scale=0.5)
+# plot translated optimized form diagram
+T = Translation.from_vector([shift * 2.0, 0.0, 0.0])
+plotter.add(form_opt.transformed(T),
+            nodesize=ns,
+            show_nodetext=True,
+            nodetext="key",
+            show_edgetext=True,
+            edgetext="force")
 
-    keys = [edge for edge in form.edges() if fabs(form.edge_force(edge)) >= 0.001]
-    # keys = None
-    plotter.draw_edges(keys=keys, text="force-length")
-    plotter.show()
+# show scene
+plotter.zoom_extents(padding=-1.2)
+plotter.show()

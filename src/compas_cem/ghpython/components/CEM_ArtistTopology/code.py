@@ -3,7 +3,7 @@ Draw a topology diagram.
 """
 from ghpythonlib.componentbase import executingcomponent as component
 
-from compas_cem.ghpython import TopologyArtist
+from compas.artists import Artist
 
 
 class TopologyArtistComponent(component):
@@ -12,19 +12,22 @@ class TopologyArtistComponent(component):
         edge_keys = edge_keys or None
         force_min = force_min or 1e-3
         force_scale = force_scale or 1.0
-        if topology:
-            artist = TopologyArtist(topology)
 
-            nodes = artist.draw_nodes(node_keys)
-            origin_nodes = artist.draw_nodes_origin(node_keys)
-            support_nodes = artist.draw_nodes_support(node_keys)
+        if not topology:
+            return
 
-            edges = artist.draw_edges(edge_keys)
-            trail_edges = artist.draw_edges_trail(edge_keys)
-            deviation_edges = artist.draw_edges_deviation(edge_keys)
+        artist = Artist(topology)
 
-            trails = artist.draw_trails()
+        nodes = artist.draw_nodes(node_keys)
+        origin_nodes = artist.draw_nodes_origin(node_keys)
+        support_nodes = artist.draw_nodes_support(node_keys)
 
-            loads = artist.draw_loads(node_keys, min_load=force_min, scale=force_scale)
+        edges = artist.draw_edges(edge_keys)
+        trail_edges = artist.draw_edges_trail(edge_keys)
+        deviation_edges = artist.draw_edges_deviation(edge_keys)
 
-            return nodes, origin_nodes, support_nodes, edges, trail_edges, deviation_edges, trails, loads
+        trails = artist.draw_trails()
+
+        loads = artist.draw_loads(node_keys, min_load=force_min, scale=force_scale)
+
+        return nodes, origin_nodes, support_nodes, edges, trail_edges, deviation_edges, trails, loads
