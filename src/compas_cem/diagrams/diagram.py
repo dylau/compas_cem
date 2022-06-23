@@ -7,9 +7,7 @@ from compas_cem import Data
 from compas_cem.diagrams import NodeMixins
 from compas_cem.diagrams import EdgeMixins
 
-
 __all__ = ["Diagram"]
-
 
 # ==============================================================================
 # Diagram
