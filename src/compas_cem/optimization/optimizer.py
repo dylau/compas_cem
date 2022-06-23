@@ -2,15 +2,14 @@ import autograd.numpy as np
 
 from functools import partial
 
-from compas_cem import Data
+from compas_cem.data import Data
 
 from compas_cem.equilibrium import static_equilibrium
-
 from compas_cem.equilibrium.force_numpy import equilibrium_state_numpy
 
-from compas_cem.optimization import nlopt_solver
 from compas_cem.optimization import grad_autograd
 from compas_cem.optimization import objective_function_numpy
+from compas_cem.optimization import nlopt_solver
 from compas_cem.optimization import nlopt_status
 
 from nlopt import RoundoffLimited
@@ -27,7 +26,9 @@ class Optimizer(Data):
     """
     An object that modifies a form diagram to meet multiple constraints.
     """
-    def __init__(self):
+    def __init__(self, **kwargs):
+        super(Optimizer, self).__init__(**kwargs)
+
         self.parameters = {}
         self.constraints = {}
         self.x_opt = None
@@ -284,7 +285,7 @@ class Optimizer(Data):
             if not isinstance(node, int):
                 continue
 
-            # TODO: this check should happen upon assembly, not at calculation?
+            # TODO: this check should happen upon assembly, not during calculation?
             if not topology.is_node_origin(node):
                 msg = "{} is not a root node. Assigned constraint is invalid!"
                 raise ValueError(msg.format(node))

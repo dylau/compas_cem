@@ -18,6 +18,11 @@ from compas_cem import COLORS
 __all__ = ["FormArtist", "TopologyArtist"]
 
 
+# ------------------------------------------------------------------------------
+# Diagram artist
+# ------------------------------------------------------------------------------
+
+
 class DiagramArtist(NetworkArtist):
     """
     An artist to draw diagrams.
@@ -224,6 +229,22 @@ class DiagramArtist(NetworkArtist):
             keys = [key for key in keys if filterer(key)]
         return keys
 
+    def clear_edges(self):
+        """
+        GH Artists are state-less. Therefore, clear does not have any effect.
+        """
+        pass
+
+    def clear_nodes(self):
+        """
+        GH Artists are state-less. Therefore, clear does not have any effect.
+        """
+        pass
+
+# ------------------------------------------------------------------------------
+# Form diagram artist
+# ------------------------------------------------------------------------------
+
 
 class FormArtist(DiagramArtist):
     """
@@ -282,6 +303,10 @@ class FormArtist(DiagramArtist):
             shift[node] = s
 
         return self._draw_forces(nodes, attrs, scale, shift, gap, min_force)
+
+# ------------------------------------------------------------------------------
+# Topology diagram artist
+# ------------------------------------------------------------------------------
 
 
 class TopologyArtist(DiagramArtist):

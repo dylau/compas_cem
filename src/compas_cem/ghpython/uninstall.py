@@ -5,14 +5,16 @@ from __future__ import print_function
 import glob
 import os
 
-import compas
+from compas.plugins import plugin
+
 from compas_ghpython.components import uninstall_userobjects
 
 
-@compas.plugins.plugin(category='install')
+@plugin(category='install')
 def after_rhino_uninstall(uninstalled_packages):
     if 'compas_cem' not in uninstalled_packages:
         return []
+
     srcdir = os.path.join(os.path.dirname(__file__), 'components', 'ghuser')
     userobjects = [os.path.basename(ghuser) for ghuser in glob.glob(os.path.join(srcdir, '*.ghuser'))]
     uninstalled_objects = uninstall_userobjects(userobjects)

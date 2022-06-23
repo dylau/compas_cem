@@ -11,22 +11,99 @@ Unreleased
 
 **Added**
 
-- Added spiral staircase ghpython example
-- Added Jenssen tensegrity ghpython example
-- Added tube bridge 3d ghpython example
-- Added bridge 2d ghpython example
-- Added dome ghpython example
-- Implemented `TopologyDiagram.is_node_support()`
-
 **Changed**
-
-- Changed reaction force global color from dark blue to dark gray
 
 **Fixed**
 
 **Deprecated**
 
 **Removed**
+
+0.5.0
+----------
+
+**Added**
+
+- Implemented `compas_cem.plotters.Plotter`
+- Implemented `compas_cem.viewers.Viewer`
+- Implemented `compas_cem.viewers.DiagramObject`
+- Implemented `compas_cem.viewers.TopologyDiagramObject`
+- Implemented `compas_cem.viewers.FormDiagramObject`
+- Created `compas_cem.viewers`
+
+**Changed**
+
+**Fixed**
+
+**Deprecated**
+
+**Removed**
+
+0.4.1
+----------
+
+**Added**
+
+- Implemented `ProxyServer` GH component to accelerate optimization time in Rhino.
+- Added `compas_cem.diagrams.Diagram.__str__()`.
+
+**Changed**
+
+- Changed `ConstrainedFormFinding` GH component to check for existing `ProxyServer`.
+- Changed `nlopt_status` flags for better interpretability in ghpython.
+
+**Fixed**
+
+- Fixed bug in `compas_cem.ghpython.artists` registration.
+- Fixed bug in serialization and target computation in `optimization.constraints.VectorConstraint`.
+- Fixed bug in `Plane` creation caused by old version of `compas_rhino.RhinoPlane.from_geometry`.
+
+**Deprecated**
+
+**Removed**
+
+- Removed `compas_cem.loads.NodeLoad.from_rhino_point_and_vector`
+- Removed `compas_cem.supports.NodeSupport.from_rhino_point`
+- Removed `compas_cem.elements.Edge.from_rhino_line`
+- Removed `compas_cem.elements.Node.from_rhino_point`
+- Removed `compas_cem.data.GHData`.
+
+0.4.0
+----------
+
+**Added**
+
+- Added spiral staircase ghpython example.
+- Added Jenssen tensegrity ghpython example.
+- Added tube bridge 3d ghpython example.
+- Added bridge 2d ghpython example.
+- Added dome ghpython example.
+- Implemented `TopologyDiagram.is_node_support()`.
+- Renamed node and edge key search GH components.
+- Implemented `compas_cem.data.Data`.
+- Implemented `compas_cem.plotters.TopologyArtist`.
+- Implemented `compas_cem.plotters.FormArtist`.
+- Implemented `compas_cem.optimization.Parameter`.
+- Added artists registration for plotters and grasshopper via `compas.plugins.plugin`.
+
+**Changed**
+
+- Changed reaction force global color from dark blue to dark gray.
+- Changed data serialization mechanism to comply with `compas.data.Data`.
+
+**Fixed**
+
+- Fixed bug in auxiliary trails coloring in `compas_cem.plotters`.
+
+**Deprecated**
+
+- Deprecated `TopologyPlotter`.
+- Deprecated `FormPlotter`.
+
+**Removed**
+
+- Removed `compas_cem.optimization.serialization.Serializable`.
+- Removed `compas_cem.ghpython.components.Node` component.
 
 0.2.2
 ----------
